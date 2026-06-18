@@ -1,21 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { getToken } from "@/lib/auth"
+import AppShell from "@/components/ui/AppShell"
+import GlassCard from "@/components/ui/GlassCard"
 
-export default function WithdrawPage() {
-  const router = useRouter()
+export default function Withdraw() {
   const [form, setForm] = useState({
     amount: "",
     bankName: "",
     accountNo: ""
   })
 
-  async function submit(e: any) {
-    e.preventDefault()
-
-    const token = getToken()
+  async function submit() {
+    const token = localStorage.getItem("token")
 
     const res = await fetch("/api/withdraw", {
       method: "POST",
@@ -27,47 +24,53 @@ export default function WithdrawPage() {
     })
 
     const data = await res.json()
-
-    if (data.success) {
-      alert("Withdrawal request submitted")
-      router.push("/dashboard")
-    } else {
-      alert(data.error)
-    }
+    alert(data.success ? "Submitted" : data.error)
   }
 
   return (
-    <div style={{
-      background: "#0f172a",
-      minHeight: "100vh",
-      color: "white",
-      padding: 20
-    }}>
-      <h1>Withdraw Funds</h1>
+    <AppShell>
 
-      <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 20 }}>
-        <input placeholder="Amount"
+      <h2>Withdraw Funds</h2>
+
+      <GlassCard>
+
+        <input placeholder="Amount" style={input}
           onChange={e => setForm({ ...form, amount: e.target.value })}
         />
 
-        <input placeholder="Bank Name"
+        <input placeholder="Bank Name" style={input}
           onChange={e => setForm({ ...form, bankName: e.target.value })}
         />
 
-        <input placeholder="Account Number"
+        <input placeholder="Account Number" style={input}
           onChange={e => setForm({ ...form, accountNo: e.target.value })}
         />
 
-        <button style={{
-          padding: 12,
-          background: "#2563eb",
-          color: "white",
-          border: "none",
-          borderRadius: 10
-        }}>
+        <button style={btn} onClick={submit}>
           Submit Withdrawal
         </button>
-      </form>
-    </div>
+
+      </GlassCard>
+
+    </AppShell>
   )
+}
+
+const input = {
+  width: "100%",
+  padding: 12,
+  marginBottom: 10,
+  borderRadius: 10,
+  border: "1px solid #2a3b5f",
+  background: "#0b1220",
+  color: "white"
+}
+
+const btn = {
+  width: "100%",
+  padding: 12,
+  borderRadius: 10,
+  background: "#2563eb",
+  color: "white",
+  border: "none"
 }

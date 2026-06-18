@@ -1,59 +1,74 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import AppShell from "@/components/ui/AppShell"
+import GlassCard from "@/components/ui/GlassCard"
 import { useRouter } from "next/navigation"
-import { getToken, logout } from "@/lib/auth"
-import BottomNav from "@/components/navigation/BottomNav"
 
 export default function Dashboard() {
   const router = useRouter()
   const [data, setData] = useState<any>(null)
 
   useEffect(() => {
-    const token = getToken()
-
-    if (!token) {
-      router.push("/login")
-      return
-    }
+    const token = localStorage.getItem("token")
+    if (!token) return router.push("/login")
 
     fetch("/api/wallet", {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => res.json())
-      .then(res => {
-        if (res.error) logout()
-        else setData(res)
-      })
+      .then(r => r.json())
+      .then(setData)
   }, [])
 
-  if (!data) return <div style={{ color: "white", padding: 20 }}>Loading...</div>
+  if (!data) return <div style={{ color: "white" }}>Loading...</div>
 
   return (
-    <div style={{ background: "#0f172a", minHeight: "100vh", color: "white", paddingBottom: 80 }}>
+    <AppShell>
 
-      <div style={{ padding: 20 }}>
-        <h1>CashPay Wallet</h1>
-      </div>
+      <h2 style={{ marginBottom: 10 }}>CashPay Wallet</h2>
+
+      <GlassCard>
+        <p style={{ opacity: 0.7 }}>Available Balance</p>
+        <h1 style={{ fontSize: 32 }}>₦{data.user.balance}</h1>
+      </GlassCard>
 
       <div style={{
-        margin: 16,
-        padding: 20,
-        borderRadius: 16,
-        background: "linear-gradient(135deg,#2563eb,#1d4ed8)"
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 12,
+        marginTop: 16
       }}>
-        <h2>₦{data.user.balance}</h2>
+
+        <button style={btn} onClick={() => router.push("/withdraw")}>
+          Withdraw
+        </button>
+
+        <button style={btn}>
+          Tasks
+        </button>
+
+        <button style={btn}>
+          History
+        </button>
+
+        <button style={btn}>
+          Support
+        </button>
+
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, padding: 16 }}>
-        <button onClick={() => router.push("/withdraw")} style={btn}>Withdraw</button>
-        <button onClick={() => router.push("/dashboard")} style={btn}>Tasks</button>
-        <button style={btn}>History</button>
-        <button style={btn}>Support</button>
-      </div>
+      <GlassCard>
+        <h3>Recent Transactions</h3>
 
-      <BottomNav />
-    </div>
+        {data.transactions?.map((t: any) => (
+          <div key={t.id} style={row}>
+            <span>{t.type}</span>
+            <span>₦{t.amount}</span>
+          </div>
+        ))}
+      </GlassCard>
+
+    </AppShell>
   )
 }
 
@@ -63,4 +78,11 @@ const btn = {
   background: "#111c33",
   color: "white",
   border: "1px solid #1f2a44"
+}
+
+const row = {
+  display: "flex",
+  justifyContent: "space-between",
+  padding: "10px 0",
+  borderBottom: "1px solid #1f2a44"
 }

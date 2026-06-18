@@ -1,43 +1,59 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import AuthLayout from "@/components/ui/AuthLayout"
+import GlassCard from "@/components/ui/GlassCard"
 
 export default function Register() {
-  const router = useRouter()
-  const [form, setForm] = useState({ name: "", email: "", password: "" })
-
-  async function submit(e: any) {
-    e.preventDefault()
-
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form)
-    })
-
-    const data = await res.json()
-
-    if (data.success) {
-      router.push("/login")
-    } else {
-      alert(data.error)
-    }
-  }
+  const [form, setForm] = useState({})
 
   return (
-    <div style={{ padding: 40, background: "#0f172a", color: "white", minHeight: "100vh" }}>
-      <h1>CashPay Register</h1>
+    <AuthLayout>
+      <GlassCard>
 
-      <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 300 }}>
-        <input placeholder="Name" onChange={e => setForm({ ...form, name: e.target.value })} />
-        <input placeholder="Email" onChange={e => setForm({ ...form, email: e.target.value })} />
-        <input placeholder="Password" type="password" onChange={e => setForm({ ...form, password: e.target.value })} />
+        <h1 style={{ fontSize: 26, marginBottom: 5 }}>CashPay</h1>
+        <p style={{ opacity: 0.7, marginBottom: 20 }}>Create your account</p>
 
-        <button style={{ padding: 10, background: "#2563eb", color: "white" }}>
+        <input placeholder="Full Name" style={input} />
+        <input placeholder="Email" style={input} />
+        <input placeholder="Password" style={input} />
+        <input placeholder="Phone Number" style={input} />
+
+        <div style={{ marginTop: 15, marginBottom: 10 }}>
+          <h3 style={{ fontSize: 14, opacity: 0.8 }}>
+            BANK DETAILS (FOR WITHDRAWAL)
+          </h3>
+        </div>
+
+        <input placeholder="Bank Name" style={input} />
+        <input placeholder="Account Number" style={input} />
+
+        <button style={btn}>
           Create Account
         </button>
-      </form>
-    </div>
+
+      </GlassCard>
+    </AuthLayout>
   )
+}
+
+const input = {
+  width: "100%",
+  padding: 12,
+  marginBottom: 10,
+  borderRadius: 10,
+  border: "1px solid #2a3b5f",
+  background: "#0b1220",
+  color: "white"
+}
+
+const btn = {
+  width: "100%",
+  padding: 12,
+  borderRadius: 10,
+  background: "#2563eb",
+  color: "white",
+  border: "none",
+  marginTop: 10,
+  fontWeight: 600
 }

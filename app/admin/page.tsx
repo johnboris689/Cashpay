@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Container from "@/components/Container"
-import Card from "@/components/Card"
+import AppShell from "@/components/ui/AppShell"
+import GlassCard from "@/components/ui/GlassCard"
 
-export default function AdminDashboard() {
+export default function Admin() {
   const [stats, setStats] = useState<any>({})
 
   useEffect(() => {
@@ -13,33 +13,21 @@ export default function AdminDashboard() {
       fetch("/api/admin/tasks").then(r => r.json()),
       fetch("/api/admin/withdrawals").then(r => r.json())
     ]).then(([users, tasks, withdrawals]) => {
-      const totalBalance = users.reduce((sum: number, u: any) => sum + (u.balance || 0), 0)
-      const pendingWithdrawals = withdrawals.filter((w: any) => w.status === "pending")
-
-      setStats({
-        users,
-        tasks,
-        withdrawals,
-        totalBalance,
-        pendingWithdrawals
-      })
+      setStats({ users, tasks, withdrawals })
     })
   }, [])
 
   return (
-    <div style={{ background: "#0f172a", minHeight: "100vh", color: "white" }}>
-      <Container>
+    <AppShell>
 
-        <h1>Admin Analytics</h1>
+      <h2>Admin Dashboard</h2>
 
-        <Card>
-          <p>Total Users: {stats.users?.length || 0}</p>
-          <p>Total Tasks: {stats.tasks?.length || 0}</p>
-          <p>Total Platform Balance: ₦{stats.totalBalance || 0}</p>
-          <p>Pending Withdrawals: {stats.pendingWithdrawals?.length || 0}</p>
-        </Card>
+      <GlassCard>
+        <p>Total Users: {stats.users?.length || 0}</p>
+        <p>Total Tasks: {stats.tasks?.length || 0}</p>
+        <p>Withdrawals: {stats.withdrawals?.length || 0}</p>
+      </GlassCard>
 
-      </Container>
-    </div>
+    </AppShell>
   )
 }
